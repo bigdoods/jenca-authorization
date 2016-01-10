@@ -1,15 +1,12 @@
 var HttpHashRouter = require('http-hash-router')
-var concat = require('concat-stream')
+
+var Access = require('./routes/access')
 
 module.exports = function(config){
 
   var router = HttpHashRouter();
 
-  router.set('/v1/access', {
-    POST:function(req, res, opts, cb){
-      res.end('ok')
-    }
-  })
+  router.set('/v1/access', Access(config))
 
   function handler(req, res) {
     router(req, res, {}, onError);
@@ -22,5 +19,7 @@ module.exports = function(config){
     }
   }
 
-  return handler
+  return {
+    handler:handler
+  }
 }
