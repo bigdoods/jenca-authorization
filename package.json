@@ -1,0 +1,29 @@
+{
+  "name": "jenca-authorization",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The jenca authorization service",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jenca-cloud/jenca-authorization.git"
+  },
+  "author": "jenca",
+  "license": "APACHE2",
+  "bugs": {
+    "url": "https://github.com/jenca-cloud/jenca-authorization/issues"
+  },
+  "homepage": "https://github.com/jenca-cloud/jenca-authorization",
+  "devDependencies": {
+    "async": "^1.5.0",
+    "concat-stream": "^1.5.1",
+    "tape": "^4.3.0",
+    "hyperquest": "^1.2.0"
+  },
+  "dependencies": {
+    "minimist": "^1.2.0"
+  }
+}
