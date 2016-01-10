@@ -9,7 +9,7 @@ var concat = require('concat-stream')
 tape('basic http request response', function (t) {
 
   var router = Router({})
-  var server = http.createServer(router)
+  var server = http.createServer(router.handler)
 
   async.series([
     function(next){
