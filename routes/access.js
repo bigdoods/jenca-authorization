@@ -14,6 +14,7 @@ module.exports = function(config){
       
     */
     POST:function(req, res, opts, cb){
+      
       req.pipe(concat(function(body){
 
         /*
@@ -49,8 +50,8 @@ module.exports = function(config){
           }
           
           res.statusCode = 200
-          res.headers['content-type'] = 'application/json'
-          res.end(JSON.stringify(data))
+          res.setHeader('content-type', 'application/json')
+          res.end(JSON.stringify(reply))
         })
       }))
     }

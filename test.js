@@ -6,6 +6,20 @@ var from2 = require('from2-string')
 var hyperquest = require('hyperquest')
 var concat = require('concat-stream')
 
+function getSourceStream(){
+  return from2(JSON.stringify({
+    url:'/v1/projects/project',
+    headers:{
+      'x-jenca-test':'pineapple'
+    },
+    method:'post',
+    data:{
+      loggedIn:true,
+      email:'bob@bob.com'
+    }
+  }))
+}
+
 tape('basic http request response', function (t) {
 
   var router = Router({})
@@ -23,23 +37,13 @@ tape('basic http request response', function (t) {
         }
       })
 
-      var sourceStream = from2(JSON.stringify({
-        url:'/v1/projects/project',
-        headers:{
-          'x-jenca-test':'pineapple'
-        },
-        method:'post',
-        data:{
-          loggedIn:true,
-          email:'bob@bob.com'
-        }
-      }))
+      var sourceStream = getSourceStream()
 
       var destStream = concat(function(result){
-        //result = JSON.parse(result.toString())
-        console.log(result.toString())
+        result = JSON.parse(result.toString())
+        t.equal(result.access, null, 'the access code is null')
+        
         next()
-        //done(null, result)
       })
 
       sourceStream.pipe(req).pipe(destStream)
@@ -49,7 +53,7 @@ tape('basic http request response', function (t) {
       })
 
       req.on('error', function(err){
-        done(err.toString())
+        next(err.toString())
       })
     },
     function(next){
