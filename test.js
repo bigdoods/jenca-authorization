@@ -130,3 +130,57 @@ tape('test middleware', function (t) {
   })
 
 })
+
+
+tape('allow all middleware', function (t) {
+
+  var middleware = require('./middleware/allowall')(process.env)
+
+  var router = Router({
+    middleware:middleware
+  })
+
+  var server = http.createServer(router.handler)
+
+  async.series([
+    function(next){
+      server.listen(8060, next)
+    },
+    function(next){
+      var req = hyperquest('http://127.0.0.1:8060/v1/access', {
+        method:'POST'
+      })
+
+      var sourceStream = getSourceStream()
+
+      var destStream = concat(function(result){
+        result = JSON.parse(result.toString())
+        t.deepEqual(result, {
+          access:'all'
+        }, 'the returned access code is correct')
+        next()
+      })
+
+      sourceStream.pipe(req).pipe(destStream)
+
+      req.on('response', function(res){
+        t.equal(res.statusCode, 200, 'The status code == 200')
+      })
+
+      req.on('error', function(err){
+        next(err.toString())
+      })
+    },
+    function(next){
+      server.close(next)
+    }
+  ], function(err){
+    if(err){
+      t.error(err)
+      t.end()
+      return
+    }
+    t.end()
+  })
+
+})
