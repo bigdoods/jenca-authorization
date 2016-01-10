@@ -36,3 +36,43 @@ It should respond with the following JSON:
 
 `access` is written to all backend service requests as the `x-jenca-access` header.  It should be a string (JSON or other) that services will use to decide on what access level.
 
+## middleware
+
+The `router.js` will accept a `middleware` argument and in this way the authorization logic is pluggable.
+
+The `middleware` function has the following signature:
+
+```js
+function(data, done){
+  
+}
+```
+
+`data` is the incoming JSON body (with url, method, headers and data fields).
+`done` is the callback with a signature of `(error, reply)`
+
+`reply` is what is returned back to the `jenca-router` and should have (access, error and statusCode fields)
+
+## CLI
+
+The server is started with the following options:
+
+```js
+var args = require('minimist')(process.argv, {
+  alias:{
+    p:'port',
+    m:'middleware'
+  },
+  default:{
+    port:process.env.PORT || 80,
+    middleware:process.env.MIDDLEWARE || 'allowall'
+  }
+})
+```
+
+The `port` setting controls the TCP port the server listens on.
+The `middleware` setting controls which module from the `middleware` folder it will load.  For example the following command would load the `allowall` middleware (`middleware/allowall.js`):
+
+```bash
+$ node index.js --middleware allowall
+```
