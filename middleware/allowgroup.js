@@ -164,7 +164,9 @@ module.exports = function(config){
 
   function authorise_request(req, done){
     var userid = req.headers['x-jenca-user']
-    var permissionid = settings[req.method][req.url]
+    var permissionid = settings.url_map[req.method.toUpperCase()][req.jsonBody.url]
+
+    // console.log(req.method.toUpperCase() + ' : '+ req.jsonBody.url +' -> '+ permissionid)
 
     authorise(userid, permissionid, done)
   }
