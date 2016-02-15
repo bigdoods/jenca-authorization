@@ -1,5 +1,6 @@
 var pg = require('pg');
-var conString = "postgres://username:password@localhost/jenca-authorisation";
+var postgresHost = process.env.POSTGRES_HOST || '127.0.0.1'
+var conString = "postgres://username:password@" + postgresHost + "/jenca-authorisation";
 var settings = require('../settings.js');
 var uuid = require('uuid');
 
