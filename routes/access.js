@@ -9,7 +9,7 @@ function defaultMiddleware(data, done){
 module.exports = function(config){
 
   return {
-    GET:jsonRequest(function(req, res, opts, cb){
+    GET:function(req, res, opts, cb){
       /*
 
         create a function that runs through our middleware
@@ -36,7 +36,7 @@ module.exports = function(config){
         res.end(JSON.stringify(reply))
       })
 
-    }),
+    },
 
     /*
 
