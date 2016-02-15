@@ -28,7 +28,7 @@ var jenca_user_id = "banana-man"
 function getSourceStream(){
   return from2(JSON.stringify(sourceData))
 }
-/*
+
 tape('basic http request response', function (t) {
 
   var router = Router({})
@@ -50,7 +50,7 @@ tape('basic http request response', function (t) {
 
       var destStream = concat(function(result){
         result = JSON.parse(result.toString())
-        t.equal(result.access, null, 'the access code is null')
+        t.equal(result.access, 'all', 'the access code is null')
 
         next()
       })
@@ -82,11 +82,13 @@ tape('basic http request response', function (t) {
 
 tape('test middleware', function (t) {
 
-  var middleware = function(data, next){
-    t.deepEqual(data, sourceData, 'data is sourcedata')
-    next(null, {
-      fruit:'guava'
-    })
+  var middleware = {
+    authorise_request:function(data, next){
+      t.deepEqual(data.jsonBody, sourceData, 'data is sourcedata')
+      next(null, {
+        fruit:'guava'
+      })
+    }
   }
 
   var router = Router({
@@ -193,7 +195,7 @@ tape('allow all middleware', function (t) {
 })
 
 
-*/
+
 
 
 tape('allow group middleware', function (t) {
@@ -212,12 +214,12 @@ tape('allow group middleware', function (t) {
     },
     function(next){
       // setup permissions for retrieval
-      middleware.save_user({id:uuid.v1()}, {id:uuid.v1(),name:"testing group"}, ["projects.test","projects.manage"], function(err){
+      middleware.save_user({id:jenca_user_id}, {id:uuid.v1(),name:"testing group"}, ["projects.test","projects.manage"], function(err){
         next(err)
       })
     },
     function(next){
-      var req = hyperquest('http://127.0.0.1:8060/v1/access/project.test', {
+      var req = hyperquest('http://127.0.0.1:8060/v1/access/projects.test', {
         method:'GET',
         headers: {
             "x-jenca-user":jenca_user_id

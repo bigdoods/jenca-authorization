@@ -17,14 +17,16 @@ function pg_query(query, params, done){
     }
 
 /*    console.log(query)
-    console.dir(params)
-*/
+    console.dir(params)*/
+
     client.query(query, params, function(err, result) {
       //call `release()` to release the client back to the pool
       release();
 
       if(err){
-        console.log(err)
+        console.log(err.toString())
+        console.log(query)
+        console.dir(params)
         release(err)
         done(err)
         return
@@ -125,25 +127,26 @@ module.exports = function(config){
 
               set({group_id:group.id,permission_id:permission_id}, "group_permissions", function(err){
                 if(err) return done(err)
+
+                if(index == (permissions.length-1))
+                  done(null, group.id)
               })
             })
           })
-
-          done(null, group.id)
         })
       })
     })
   }
 
   function authorise(userid, permissionid, done){
-    pg_query("SELECT ug.group_id FROM users u LEFT JOIN user_groups ug ON u.id=ug.user_id WHERE u.id='$1::string'", [userid], function(err, result){
+    pg_query("SELECT ug.group_id FROM users u LEFT JOIN user_groups ug ON u.id=ug.user_id WHERE u.id=$1", [userid], function(err, result){
       if(err) return done(err)
 
       var group_ids = result.rows.map(function(u){
         return u.group_id
       })
 
-      pg_query("SELECT p.* FROM groups g LEFT JOIN permissions p ON p.name='$1::string' AND p.group_id=g.id WHERE g.id IN ('$2::string')", [permissionid, group_ids.join("','")], function(err, result){
+      pg_query("SELECT p.* FROM group_permissions gp INNER JOIN permissions p ON p.name=$1 AND gp.permission_id=p.id WHERE gp.group_id=$2", [permissionid, group_ids.join("','")], function(err, result){
         if(err) return done(err)
 
         var access = {
@@ -153,14 +156,13 @@ module.exports = function(config){
         if(result.rows.length >0)
           access.access = true
 
-        done(null, JSON.stringify(access))
+        done(null, access)
       })
     })
   }
 
   function authorise_request(req, done){
     var userid = req.headers['x-jenca-user']
-    console.dir(req)
     var permissionid = settings[req.method][req.url]
 
     authorise(userid, permissionid, done)
