@@ -6,6 +6,12 @@ var from2 = require('from2-string')
 var hyperquest = require('hyperquest')
 var concat = require('concat-stream')
 
+var pg = require('pg')
+var uuid = require('uuid');
+
+
+
+
 var sourceData = {
   url:'/v1/projects/project',
   headers:{
@@ -17,11 +23,12 @@ var sourceData = {
     email:'bob@bob.com'
   }
 }
+var jenca_user_id = "banana-man"
 
 function getSourceStream(){
   return from2(JSON.stringify(sourceData))
 }
-
+/*
 tape('basic http request response', function (t) {
 
   var router = Router({})
@@ -44,7 +51,7 @@ tape('basic http request response', function (t) {
       var destStream = concat(function(result){
         result = JSON.parse(result.toString())
         t.equal(result.access, null, 'the access code is null')
-        
+
         next()
       })
 
@@ -162,6 +169,70 @@ tape('allow all middleware', function (t) {
       })
 
       sourceStream.pipe(req).pipe(destStream)
+
+      req.on('response', function(res){
+        t.equal(res.statusCode, 200, 'The status code == 200')
+      })
+
+      req.on('error', function(err){
+        next(err.toString())
+      })
+    },
+    function(next){
+      server.close(next)
+    }
+  ], function(err){
+    if(err){
+      t.error(err)
+      t.end()
+      return
+    }
+    t.end()
+  })
+
+})
+
+
+*/
+
+
+tape('allow group middleware', function (t) {
+
+  var middleware = require('./middleware/allowgroup')(process.env)
+
+  var router = Router({
+    middleware:middleware
+  })
+
+  var server = http.createServer(router.handler)
+
+  async.series([
+    function(next){
+      server.listen(8060, next)
+    },
+    function(next){
+      // setup permissions for retrieval
+      middleware.save_user({id:uuid.v1()}, {id:uuid.v1(),name:"testing group"}, ["projects.test","projects.manage"], function(err){
+        next(err)
+      })
+    },
+    function(next){
+      var req = hyperquest('http://127.0.0.1:8060/v1/access/project.test', {
+        method:'GET',
+        headers: {
+            "x-jenca-user":jenca_user_id
+        }
+      })
+
+      var destStream = concat(function(result){
+        result = JSON.parse(result.toString())
+        t.deepEqual(result, {
+          access:true
+        }, 'the returned access code is correct')
+        next()
+      })
+
+      req.pipe(destStream)
 
       req.on('response', function(res){
         t.equal(res.statusCode, 200, 'The status code == 200')
