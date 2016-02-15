@@ -24,9 +24,10 @@ function pg_query(query, params, done){
       release();
 
       if(err){
-        console.log(err.toString())
+/*        console.log(err.toString())
         console.log(query)
         console.dir(params)
+*/
         release(err)
         done(err)
         return
