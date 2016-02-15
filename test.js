@@ -8,6 +8,8 @@ var concat = require('concat-stream')
 
 var pg = require('pg')
 var uuid = require('uuid');
+var postgresHost = process.env.POSTGRES_HOST || '127.0.0.1'
+var conString = "postgres://username:password@" + postgresHost + "/jenca-authorisation";
 
 
 
@@ -195,7 +197,31 @@ tape('allow all middleware', function (t) {
 })
 
 
+function reset_postgres(done){
+  pg.connect(conString, function(err, client, release) {
+    if(err){
+      release(err)
+      done(err)
+      return
+    }
 
+/*    console.log(query)
+    console.dir(params)*/
+
+    client.query("delete from users;delete from groups;delete from user_groups;delete from group_permissions;delete from permissions;", [], function(err, result) {
+      //call `release()` to release the client back to the pool
+      release();
+
+      if(err){
+        release(err)
+        done(err)
+        return
+      }
+
+      done(null, result)
+    });
+  });
+}
 
 
 tape('allow group middleware', function (t) {
@@ -213,9 +239,11 @@ tape('allow group middleware', function (t) {
       server.listen(8060, next)
     },
     function(next){
-      // setup permissions for retrieval
-      middleware.save_user({id:jenca_user_id}, {id:uuid.v1(),name:"testing group"}, ["projects.test","projects.manage"], function(err){
-        next(err)
+      reset_postgres(function(){
+        // setup permissions for retrieval
+        middleware.save_user({id:jenca_user_id}, {id:uuid.v1(),name:"testing group"}, ["projects.test","projects.manage"], function(err){
+          next(err)
+        })
       })
     },
     function(next){
