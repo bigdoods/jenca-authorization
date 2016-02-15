@@ -15,7 +15,7 @@ var conString = "postgres://username:password@" + postgresHost + "/jenca-authori
 
 
 var sourceData = {
-  url:'/v1/projects/project',
+  url:'/v1/projects',
   headers:{
     'x-jenca-test':'pineapple'
   },
@@ -224,7 +224,7 @@ function reset_postgres(done){
 }
 
 
-tape('allow group middleware', function (t) {
+tape('allow group middleware auth', function (t) {
 
   var middleware = require('./middleware/allowgroup')(process.env)
 
@@ -263,6 +263,70 @@ tape('allow group middleware', function (t) {
       })
 
       req.pipe(destStream)
+
+      req.on('response', function(res){
+        t.equal(res.statusCode, 200, 'The status code == 200')
+      })
+
+      req.on('error', function(err){
+        next(err.toString())
+      })
+    },
+    function(next){
+      server.close(next)
+    }
+  ], function(err){
+    if(err){
+      t.error(err)
+      t.end()
+      return
+    }
+    t.end()
+  })
+
+})
+
+
+tape('allow group middleware auth request', function (t) {
+
+  var middleware = require('./middleware/allowgroup')(process.env)
+
+  var router = Router({
+    middleware:middleware
+  })
+
+  var server = http.createServer(router.handler)
+
+  async.series([
+    function(next){
+      server.listen(8060, next)
+    },
+    function(next){
+      reset_postgres(function(){
+        // setup permissions for retrieval
+        middleware.save_user({id:jenca_user_id}, {id:uuid.v1(),name:"testing group"}, ["projects.create"], function(err){
+          next(err)
+        })
+      })
+    },
+    function(next){
+      var req = hyperquest('http://127.0.0.1:8060/v1/access', {
+        method:'POST',
+        headers:{
+          'x-jenca-user':jenca_user_id
+        }
+      })
+
+      var sourceStream = getSourceStream()
+
+      var destStream = concat(function(result){
+        result = JSON.parse(result.toString())
+        t.equal(result.access, true, 'the access code is true')
+
+        next()
+      })
+
+      sourceStream.pipe(req).pipe(destStream)
 
       req.on('response', function(res){
         t.equal(res.statusCode, 200, 'The status code == 200')
