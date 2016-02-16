@@ -16,12 +16,11 @@ var args = require('minimist')(process.argv, {
 
 var middleware = null
 if(args.middleware){
-  
+
   if(!fs.existsSync(path.join(__dirname, 'middleware', args.middleware + '.js'))){
     throw new Error('middleware: ' + args.middleware + ' does not exist')
   }
   middleware = require('./middleware/' + args.middleware)(process.env)
-  
 }
 
 var router = Router({

@@ -1,7 +1,11 @@
 module.exports = function(config){
-  return function(data, done){
+  function authorise_request(data, done){
     done(null, {
       access:'all'
     })
+  }
+
+  return {
+  	authorise_request:authorise_request
   }
 }
