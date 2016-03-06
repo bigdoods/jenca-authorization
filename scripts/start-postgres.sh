@@ -2,8 +2,7 @@
 
 echo "starting Postgres"
 
-export POSTGRES_HOST=172.17.8.150
-
+docker rm -f postgres || true
 docker run \
   --name postgres \
   -e POSTGRES_PASSWORD=password \
@@ -13,8 +12,4 @@ docker run \
   -p 5432:5432 \
   postgres
 
-echo "postgres running on ${POSTGRES_HOST}"
-
-DATABASE_URL="postgres://username:password@${POSTGRES_HOST}/jenca-authorisation" ./node_modules/.bin/pg-migrate up
-
-npm test
+echo "postgres running"

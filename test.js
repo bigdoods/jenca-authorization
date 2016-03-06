@@ -346,6 +346,7 @@ tape('allow group middleware auth request', function (t) {
       return
     }
     t.end()
+    process.exit(0)
   })
 
 })
