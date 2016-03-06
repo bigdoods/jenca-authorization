@@ -2,8 +2,8 @@ var concat = require('concat-stream')
 var async = require('async')
 var jsonRequest = require('json-request-handler')
 
-function defaultMiddleware(){
-  var defaultMiddleware = require('../middleware/allowall')(process.env)
+function defaultMiddleware(config){
+  var defaultMiddleware = require('../middleware/allowall')(config)
   return defaultMiddleware
 }
 
@@ -16,7 +16,7 @@ module.exports = function(config){
         create a function that runs through our middleware
 
       */
-      var middleware = config.middleware || defaultMiddleware()
+      var middleware = config.middleware || defaultMiddleware(config)
 
       // here we actually trigger the middleware
       middleware.authorise(req.headers['x-jenca-user'], opts.params.permissionid, function(err, reply){

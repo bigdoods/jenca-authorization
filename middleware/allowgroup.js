@@ -1,42 +1,7 @@
 var pg = require('pg');
-var postgresHost = process.env.POSTGRES_HOST || '127.0.0.1'
-var conString = "postgres://username:password@" + postgresHost + "/jenca-authorisation";
+
 var settings = require('../settings.js');
 var uuid = require('uuid');
-
-
-function pg_query(query, params, done){
-  //this initializes a connection pool
-  //it will keep idle connections open for a (configurable) 30 seconds
-  //and set a limit of 20 (also configurable)
-  pg.connect(conString, function(err, client, release) {
-    if(err){
-      release(err)
-      done(err)
-      return
-    }
-
-/*    console.log(query)
-    console.dir(params)*/
-
-    client.query(query, params, function(err, result) {
-      //call `release()` to release the client back to the pool
-      release();
-
-      if(err){
-/*        console.log(err.toString())
-        console.log(query)
-        console.dir(params)
-*/
-        release(err)
-        done(err)
-        return
-      }
-
-      done(null, result)
-    });
-  });
-}
 
 function parse_conditions(data, seperator){
   var conditions = Object.keys(data).map(function(e,i){
@@ -47,6 +12,48 @@ function parse_conditions(data, seperator){
 }
 
 module.exports = function(config){
+
+  function get_postgres_connection_string(){
+    var host = config.host || '127.0.0.1'
+    var username = config.username || 'username'
+    var password = config.password || 'password'
+    var database = config.database || 'jenca-authorisation'
+    return 'postgres://' + username + ':' + password + '@' + host + '/jenca-authorisation';
+  }
+
+  function pg_query(query, params, done){
+    //this initializes a connection pool
+    //it will keep idle connections open for a (configurable) 30 seconds
+    //and set a limit of 20 (also configurable)
+    pg.connect(get_postgres_connection_string(), function(err, client, release) {
+      if(err){
+        release(err)
+        done(err)
+        return
+      }
+
+  /*    console.log(query)
+      console.dir(params)*/
+
+      client.query(query, params, function(err, result) {
+        //call `release()` to release the client back to the pool
+        release();
+
+        if(err){
+  /*        console.log(err.toString())
+          console.log(query)
+          console.dir(params)
+  */
+          release(err)
+          done(err)
+          return
+        }
+
+        done(null, result)
+      });
+    });
+  }
+
   function get(params, table, done){
     var conditions = parse_conditions(params, " AND ")
     var param_values = Object.keys(params).map(function(k){return params[k]});

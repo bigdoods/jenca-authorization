@@ -12,7 +12,11 @@ var postgresHost = process.env.POSTGRES_HOST || '127.0.0.1'
 var conString = "postgres://username:password@" + postgresHost + "/jenca-authorisation";
 
 
-
+function getConnectionOptions(){
+  return {
+    host:process.env.POSTGRES_HOST || '127.0.0.1'
+  }
+}
 
 var sourceData = {
   url:'/v1/projects',
@@ -33,7 +37,8 @@ function getSourceStream(){
 
 tape('basic http request response', function (t) {
 
-  var router = Router({})
+  var options = getConnectionOptions()
+  var router = Router(options)
   var server = http.createServer(router.handler)
 
   async.series([
@@ -93,10 +98,10 @@ tape('test middleware', function (t) {
     }
   }
 
-  var router = Router({
-    middleware:middleware
-  })
-
+  var options = getConnectionOptions()
+  options.middleware = middleware
+  var router = Router(options)
+    
   var server = http.createServer(router.handler)
 
   async.series([
@@ -147,9 +152,9 @@ tape('allow all middleware', function (t) {
 
   var middleware = require('./middleware/allowall')(process.env)
 
-  var router = Router({
-    middleware:middleware
-  })
+  var options = getConnectionOptions()
+  options.middleware = middleware
+  var router = Router(options)
 
   var server = http.createServer(router.handler)
 
@@ -226,11 +231,12 @@ function reset_postgres(done){
 
 tape('allow group middleware auth', function (t) {
 
-  var middleware = require('./middleware/allowgroup')(process.env)
+  var middleware = require('./middleware/allowgroup')(getConnectionOptions())
 
-  var router = Router({
-    middleware:middleware
-  })
+  var options = getConnectionOptions()
+  options.middleware = middleware
+  var router = Router(options)
+
 
   var server = http.createServer(router.handler)
 
@@ -289,11 +295,11 @@ tape('allow group middleware auth', function (t) {
 
 tape('allow group middleware auth request', function (t) {
 
-  var middleware = require('./middleware/allowgroup')(process.env)
+  var middleware = require('./middleware/allowgroup')(getConnectionOptions())
 
-  var router = Router({
-    middleware:middleware
-  })
+  var options = getConnectionOptions()
+  options.middleware = middleware
+  var router = Router(options)
 
   var server = http.createServer(router.handler)
 
