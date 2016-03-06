@@ -15,6 +15,10 @@ module.exports = function(config){
 
   function get_postgres_connection_string(){
     var host = config.host || '127.0.0.1'
+    if(host.indexOf('env:')){
+      var envname = host.split(':')[1]
+      host = process.env[envname]
+    }
     var username = config.username || 'username'
     var password = config.password || 'password'
     var database = config.database || 'jenca-authorisation'
