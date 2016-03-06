@@ -18,13 +18,14 @@
   },
   "homepage": "https://github.com/jenca-cloud/jenca-authorization",
   "devDependencies": {
-    "async": "^1.5.0",
+    
     "concat-stream": "^1.5.1",
     "from2-string": "^1.1.0",
     "hyperquest": "^1.2.0",
     "tape": "^4.3.0"
   },
   "dependencies": {
+    "async": "^1.5.0",
     "http-hash-router": "^1.1.0",
     "json-request-handler": "^1.0.0",
     "minimist": "^1.2.0",
