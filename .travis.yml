@@ -4,10 +4,14 @@ node_js:
 sudo: required
 services:
   - docker
+  - postgresql
+before_script:
+  - psql -c 'create database jenca-authorisation;' -U postgres
+  - node_modules/.bin/pg-migrate up
 install:
   - make developer
   - npm install
-  - make test
+  - make ci
 # Post to Slack
 notifications:
   slack: jencateam:m1Z9iUkUDDtl77hoUlm4SQEb

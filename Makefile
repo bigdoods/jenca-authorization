@@ -23,6 +23,11 @@ test: postgres
 		$(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev test
 	docker rm -f postgres || true
 
+ci:
+	docker run -ti --rm \
+		--entrypoint npm \
+		$(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev test
+
 postgres:
 	bash scripts/start-postgres.sh
 
