@@ -18,7 +18,9 @@ images:
 test: postgres
 	docker run -ti --rm \
 		--entrypoint npm \
-		-e POSTGRES_HOST=postgres \
+		-e POSTGRES_HOST=$POSTGRES_HOST \
+		-e POSTGRES_USER=$POSTGRES_USER \
+		-e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
 		--link postgres:postgres \
 		$(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev test
 	docker rm -f postgres || true
@@ -26,6 +28,9 @@ test: postgres
 ci:
 	docker run -ti --rm \
 		--entrypoint npm \
+		-e POSTGRES_HOST=$POSTGRES_HOST \
+		-e POSTGRES_USER=$POSTGRES_USER \
+		-e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
 		$(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev test
 
 postgres:
