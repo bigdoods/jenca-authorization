@@ -11,6 +11,40 @@ It is called *after* the authentication service and is provided with:
  * the request headers
  * the data returned from the authentication step
 
+## run tests
+
+To run the tests get into the `jenca-cloud` dev environment (or anything that has a docker server).
+
+Then:
+
+```bash
+$ make test
+```
+
+This will:
+
+ * use docker to spin up a postgres container
+ * run the tests in a container linked to postgres
+ * use docker to stop the postgres container
+
+## run tests locally
+
+If you want to run the tests using node on your host the process is a bit different.
+
+Start postgres (do this whereever you have a Docker server):
+
+```bash
+$ make postgres
+```
+
+Run tests (do this whereever your native code is):
+
+```
+$ POSTGRES_HOST=172.17.8.150 npm test
+```
+
+Point the `POSTGRES_HOST` to whereever your tests can access a running postgres
+
 ## routes
 
 #### POST /v1/access

@@ -1,23 +1,30 @@
-.PHONY: images test
+.PHONY: images test postgres
 
 VERSION = 1.0.0
 SERVICE = jenca-authorization
+HUBACCOUNT = jenca
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # build the docker images
 # the dev version includes development node modules
 images:
-	docker build -t jenca-cloud/$(SERVICE):latest .
-	docker build -f Dockerfile.dev -t jenca-cloud/$(SERVICE):latest-dev .
-	docker rmi jenca-cloud/$(SERVICE):$(VERSION) jenca-cloud/$(SERVICE):$(VERSION)-dev || true
-	docker tag jenca-cloud/$(SERVICE):latest jenca-cloud/$(SERVICE):$(VERSION)
-	docker tag jenca-cloud/$(SERVICE):latest-dev jenca-cloud/$(SERVICE):$(VERSION)-dev
+	docker build -t $(HUBACCOUNT)/$(SERVICE):latest .
+	docker build -f Dockerfile.dev -t $(HUBACCOUNT)/$(SERVICE):latest-dev .
+	docker rmi $(HUBACCOUNT)/$(SERVICE):$(VERSION) $(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev || true
+	docker tag $(HUBACCOUNT)/$(SERVICE):latest $(HUBACCOUNT)/$(SERVICE):$(VERSION)
+	docker tag $(HUBACCOUNT)/$(SERVICE):latest-dev $(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev
 
-test:
+test: postgres
 	docker run -ti --rm \
 		--entrypoint npm \
-		jenca-cloud/$(SERVICE):$(VERSION)-dev test
+		-e POSTGRES_HOST=postgres \
+		--link postgres:postgres \
+		$(HUBACCOUNT)/$(SERVICE):$(VERSION)-dev test
+	docker rm -f postgres || true
+
+postgres:
+	bash scripts/start-postgres.sh
 
 # this automates the installation of the node_modules folder on the host
 developer: images

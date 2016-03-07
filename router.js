@@ -7,6 +7,7 @@ module.exports = function(config){
   var router = HttpHashRouter();
 
   router.set('/v1/access', Access(config))
+  router.set('/v1/access/:permissionid', Access(config))
 
   function handler(req, res) {
     router(req, res, {}, onError);
