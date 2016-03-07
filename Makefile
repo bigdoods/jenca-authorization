@@ -36,4 +36,4 @@ developer: images
 	@docker run -ti --rm \
 		--entrypoint "bash" \
 		-v $(PWD)/src/api:/srv/app \
-		jenca-cloud/$(SERVICE):$(VERSION) -c "cd /srv/app && npm install"
+		$(HUBACCOUNT)/$(SERVICE):$(VERSION) -c "cd /srv/app && npm install"
