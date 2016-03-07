@@ -1,5 +1,6 @@
 #!/bin/bash
 
+printenv
 echo $POSTGRES_HOST
 export POSTGRES_HOST=${POSTGRES_HOST:="172.17.8.150"}
 export POSTGRES_USER=${POSTGRES_USER:="username"}
