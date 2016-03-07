@@ -2,7 +2,7 @@
 
 VERSION = 1.0.0
 SERVICE = jenca-authorization
-HUBACCOUNT = jenca-cloud
+HUBACCOUNT = jenca
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
