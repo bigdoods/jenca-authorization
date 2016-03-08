@@ -106,10 +106,10 @@ tape('test middleware', function (t) {
 
   async.series([
     function(next){
-      server.listen(8060, next)
+      server.listen(8061, next)
     },
     function(next){
-      var req = hyperquest('http://127.0.0.1:8060/v1/access', {
+      var req = hyperquest('http://127.0.0.1:8061/v1/access', {
         method:'POST'
       })
 
@@ -150,7 +150,9 @@ tape('test middleware', function (t) {
 
 tape('allow all middleware', function (t) {
 
-  var middleware = require('./middleware/allowall')(process.env)
+  var middleware = require('./middleware/allowall')({
+    host:'postgres'
+  })
 
   var options = getConnectionOptions()
   options.middleware = middleware
@@ -160,10 +162,10 @@ tape('allow all middleware', function (t) {
 
   async.series([
     function(next){
-      server.listen(8060, next)
+      server.listen(8062, next)
     },
     function(next){
-      var req = hyperquest('http://127.0.0.1:8060/v1/access', {
+      var req = hyperquest('http://127.0.0.1:8062/v1/access', {
         method:'POST'
       })
 
@@ -242,7 +244,7 @@ tape('allow group middleware auth', function (t) {
 
   async.series([
     function(next){
-      server.listen(8060, next)
+      server.listen(8063, next)
     },
     function(next){
       reset_postgres(function(){
@@ -253,7 +255,7 @@ tape('allow group middleware auth', function (t) {
       })
     },
     function(next){
-      var req = hyperquest('http://127.0.0.1:8060/v1/access/projects.test', {
+      var req = hyperquest('http://127.0.0.1:8063/v1/access/projects.test', {
         method:'GET',
         headers: {
             "x-jenca-user":jenca_user_id
@@ -305,7 +307,7 @@ tape('allow group middleware auth request', function (t) {
 
   async.series([
     function(next){
-      server.listen(8060, next)
+      server.listen(8064, next)
     },
     function(next){
       reset_postgres(function(){
@@ -316,7 +318,7 @@ tape('allow group middleware auth request', function (t) {
       })
     },
     function(next){
-      var req = hyperquest('http://127.0.0.1:8060/v1/access', {
+      var req = hyperquest('http://127.0.0.1:8064/v1/access', {
         method:'POST',
         headers:{
           'x-jenca-user':jenca_user_id

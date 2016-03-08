@@ -13,23 +13,23 @@ function parse_conditions(data, seperator){
 
 module.exports = function(config){
 
-  function get_postgres_connection_string(){
-    var host = config.host || '127.0.0.1'
-    if(host.indexOf('env:')){
-      var envname = host.split(':')[1]
-      host = process.env[envname]
-    }
-    var username = config.username || 'username'
-    var password = config.password || 'password'
-    var database = config.database || 'jenca-authorisation'
-    return 'postgres://' + username + ':' + password + '@' + host + '/jenca-authorisation';
+  var host = config.host || '127.0.0.1'
+  
+  if(host.indexOf('env:')==0){
+    var envname = host.split(':')[1]
+    host = process.env[envname]
   }
-
+  
+  var username = config.username || 'username'
+  var password = config.password || 'password'
+  var database = config.database || 'jenca-authorisation'
+  var connection_string = 'postgres://' + username + ':' + password + '@' + host + '/jenca-authorisation';
+  
   function pg_query(query, params, done){
     //this initializes a connection pool
     //it will keep idle connections open for a (configurable) 30 seconds
     //and set a limit of 20 (also configurable)
-    pg.connect(get_postgres_connection_string(), function(err, client, release) {
+    pg.connect(connection_string, function(err, client, release) {
       if(err){
         release(err)
         done(err)
